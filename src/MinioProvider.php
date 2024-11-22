@@ -68,7 +68,7 @@ class MinioProvider extends ServiceProvider
     protected function mergeConfigSettings(): void
     {
         $filesystemConfigPath = config_path('filesystems.php');
-        $packageConfigPath = __DIR__ . '/../config/config.php';
+        $packageConfigPath = __DIR__ . '/config/config.php';
 
         if (!file_exists($filesystemConfigPath)) {
             throw new \RuntimeException("The file filesystems.php does not exist at path: $filesystemConfigPath");
