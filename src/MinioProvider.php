@@ -84,7 +84,7 @@ class MinioProvider extends ServiceProvider
         if (!isset($filesystemConfig['disks']['minio'])) {
             $filesystemConfig['disks']['minio'] = $packageConfig['minio'];
 
-            $newContent = $filesystemConfig;
+            $newContent = "<?php\n\nreturn " . var_export($filesystemConfig) . ";\n";
 
             file_put_contents($filesystemConfigPath, $newContent);
         }
