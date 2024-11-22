@@ -11,15 +11,7 @@ class MainController
     public function singleUpload(Request $request): string
     {
         try {
-            $request->validate([
-                'file' => 'required|file|mimes:jpeg,jpg,png,gif',
-                'entity_id' => 'required',
-                'entity_type' => 'required',
-                'section' => 'required',
-                'alt' => 'nullable',
-                'description' => 'nullable',
-            ]);
-            return MinioControl::upload($request->post(), $request->file('file'));
+            return MinioControl::upload($request->file('file'));
         } catch (\Exception $exception) {
             return response()->json(['result' => 'false', 'messages' => $exception->getMessage(), 'data' => null], 400);
         }
