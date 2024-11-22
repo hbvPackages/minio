@@ -31,31 +31,21 @@ class MinioProvider extends ServiceProvider
      */
     protected function mergeEnvVariables()
     {
-        $packageEnvPath = __DIR__ . '..//../.env.example';
-        $projectEnvPath = base_path('.env');
+        $filesystemConfigPath = config_path('filesystems.php');
+        $packageConfigPath = __DIR__ . '/../config/config.php';
 
-        if (!file_exists($packageEnvPath)) return;
+        if (!file_exists($filesystemConfigPath) || !file_exists($packageConfigPath)) {
+            return;
+        }
 
-        if (!file_exists($projectEnvPath)) {
-            copy($packageEnvPath, $projectEnvPath);
-        } else {
-            $packageEnvContent = file($packageEnvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
-            $projectEnvContent = file($projectEnvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+        $filesystemConfig = require $filesystemConfigPath;
+        $packageConfig = require $packageConfigPath;
 
-            $projectEnvKeys = array_map(function ($line) {
-                return explode('=', $line, 2)[0];
-            }, $projectEnvContent);
+        if (!isset($filesystemConfig['disks']['minio'])) {
+            $filesystemConfig['disks']['minio'] = $packageConfig['minio'];
 
-            $mergedContent = $projectEnvContent;
-
-            foreach ($packageEnvContent as $line) {
-                $key = explode('=', $line, 2)[0];
-                if (!in_array($key, $projectEnvKeys)) {
-                    $mergedContent[] = $line;
-                }
-            }
-
-            file_put_contents($projectEnvPath, implode(PHP_EOL, $mergedContent) . PHP_EOL);
+            $newContent = "<?php\n\nreturn " . var_export($filesystemConfig, true) . ";\n";
+            file_put_contents($filesystemConfigPath, $newContent);
         }
     }
 
