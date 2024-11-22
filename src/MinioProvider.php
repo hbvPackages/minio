@@ -21,7 +21,7 @@ class MinioProvider extends ServiceProvider
     public function boot(): void
     {
         $this->mergeConfigSettings();
-        $this->mergeEnvVariables();
+        //$this->mergeEnvVariables();
     }
 
     /**
