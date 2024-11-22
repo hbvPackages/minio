@@ -31,21 +31,31 @@ class MinioProvider extends ServiceProvider
      */
     protected function mergeEnvVariables()
     {
-        $filesystemConfigPath = config_path('filesystems.php');
-        $packageConfigPath = __DIR__ . '/../config/config.php';
+        $packageEnvPath = __DIR__ . '..//../.env.example';
+        $projectEnvPath = base_path('.env');
 
-        if (!file_exists($filesystemConfigPath) || !file_exists($packageConfigPath)) {
-            return;
-        }
+        if (!file_exists($packageEnvPath)) return;
 
-        $filesystemConfig = require $filesystemConfigPath;
-        $packageConfig = require $packageConfigPath;
+        if (!file_exists($projectEnvPath)) {
+            copy($packageEnvPath, $projectEnvPath);
+        } else {
+            $packageEnvContent = file($packageEnvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+            $projectEnvContent = file($projectEnvPath, FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
 
-        if (!isset($filesystemConfig['disks']['minio'])) {
-            $filesystemConfig['disks']['minio'] = $packageConfig['minio'];
+            $projectEnvKeys = array_map(function ($line) {
+                return explode('=', $line, 2)[0];
+            }, $projectEnvContent);
 
-            $newContent = "<?php\n\nreturn " . var_export($filesystemConfig, true) . ";\n";
-            file_put_contents($filesystemConfigPath, $newContent);
+            $mergedContent = $projectEnvContent;
+
+            foreach ($packageEnvContent as $line) {
+                $key = explode('=', $line, 2)[0];
+                if (!in_array($key, $projectEnvKeys)) {
+                    $mergedContent[] = $line;
+                }
+            }
+
+            file_put_contents($projectEnvPath, implode(PHP_EOL, $mergedContent) . PHP_EOL);
         }
     }
 
@@ -58,10 +68,14 @@ class MinioProvider extends ServiceProvider
     protected function mergeConfigSettings(): void
     {
         $filesystemConfigPath = config_path('filesystems.php');
-        $packageConfigPath = __DIR__ . '..//../config.php';
+        $packageConfigPath = __DIR__ . '/../config/config.php';
 
-        if (!file_exists($filesystemConfigPath) || !file_exists($packageConfigPath)) {
-            return;
+        if (!file_exists($filesystemConfigPath)) {
+            throw new \RuntimeException("The file filesystems.php does not exist at path: $filesystemConfigPath");
+        }
+
+        if (!file_exists($packageConfigPath)) {
+            throw new \RuntimeException("The package config file does not exist at path: $packageConfigPath");
         }
 
         $filesystemConfig = require $filesystemConfigPath;
@@ -69,9 +83,10 @@ class MinioProvider extends ServiceProvider
 
         if (!isset($filesystemConfig['disks']['minio'])) {
             $filesystemConfig['disks']['minio'] = $packageConfig['minio'];
-        }
 
-        $newContent = "<?php\n\nreturn " . var_export($filesystemConfig, true) . ";\n";
-        file_put_contents($filesystemConfigPath, $newContent);
+            $newContent = "<?php\n\nreturn " . var_export($filesystemConfig, true) . ";\n";
+
+            file_put_contents($filesystemConfigPath, $newContent);
+        }
     }
 }
