@@ -1,0 +1,28 @@
+{
+    "name": "hbv/minio",
+    "description": "upload on minio",
+    "type": "package",
+    "require": {
+        "league/flysystem-aws-s3-v3": "^3.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Hbv\\Minio\\": "src/"
+        }
+    },
+    "extra": {
+        "laravel": {
+            "providers": [
+                "Hbv\\Minio\\MinioProvider"
+            ]
+        }
+    },
+    "authors": [
+        {
+            "name": "vahid.habibzadeh",
+            "email": "vahid.habibzadeh73@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev"
+}
