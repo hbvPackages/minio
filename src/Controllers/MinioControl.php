@@ -22,7 +22,7 @@ class MinioControl
         }
     }
 
-    public function multiUpload($files, $path): array
+    public static function multiUpload($files, $path): array
     {
         $data = [];
         foreach ($files as $file) {
