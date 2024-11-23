@@ -29,7 +29,8 @@ class MinioControl
             $content = file_get_contents($file->getRealPath());
             $fileName = sha1(md5(time() . $file->getClientOriginalName()));
             $path = sprintf('%s/%s.jpg', $path, $fileName);
-            $data[] = Storage::disk('minio')->put($path, $content, 'public');
+            Storage::disk('minio')->put($path, $content, 'public');
+            $data[] = sprintf('%s/%s/%s', env('APP_URL'), 'minio/public',  $path);
         }
         return $data;
     }
