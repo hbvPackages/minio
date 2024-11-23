@@ -31,6 +31,9 @@ class MinioControl
             $path = sprintf('%s/%s.jpg', $path, $fileName);
             Storage::disk('minio')->put($path, $content, 'public');
             $data[] = sprintf('%s/%s/%s', env('APP_URL'), 'minio/public',  $path);
+            $content = '';
+            $fileName = '';
+            $path = '';
         }
         return $data;
     }
