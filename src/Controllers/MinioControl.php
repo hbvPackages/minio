@@ -22,18 +22,17 @@ class MinioControl
         }
     }
 
-    public static function multiUpload($files, $path='public'): array
+    public static function multiUpload($files, $publicPath='public'): array
     {
         $data = [];
         foreach ($files as $file) {
             $content = file_get_contents($file->getRealPath());
             $fileName = sha1(md5(time() . $file->getClientOriginalName()));
-            $path = sprintf('%s/%s.jpg', $path, $fileName);
+            $path = sprintf('%s/%s.jpg', $publicPath, $fileName);
             Storage::disk('minio')->put($path, $content, 'public');
             $data[] = sprintf('%s/%s/%s', env('APP_URL'), 'minio/public',  $path);
             $content = '';
             $fileName = '';
-            $path = '';
         }
         return $data;
     }
