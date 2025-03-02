@@ -66,4 +66,15 @@ class MinioControl
     {
         return Storage::disk('minio')->delete($path);
     }
+
+    /**
+     * @param $url
+     * @return string
+     */
+    public static function getStoragePathFromUrl($url): string
+    {
+        $baseUrl = env('APP_URL');
+        $prefix = 'minio/public/';
+        return str_replace($baseUrl . '/' . $prefix, '', $url);
+    }
 }
