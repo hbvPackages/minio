@@ -66,5 +66,4 @@ class MinioControl
     {
         return Storage::disk('minio')->delete($path);
     }
-
 }
